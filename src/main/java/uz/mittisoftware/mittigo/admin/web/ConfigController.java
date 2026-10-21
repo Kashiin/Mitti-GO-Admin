@@ -176,7 +176,7 @@ class ConfigController {
         return "redirect:/prices";
     }
 
-    /** What Pro adds (C45): [maxDevices] counts the parent phone. Free is fixed in the app: 5 channels, 10 playlists, 2 devices. */
+    /** What Pro adds (C45): [maxDevices] counts the parent phone. Free is fixed: 5 channels, 10 playlists (in the app), 3 devices (`device_limit.free_max`, C51). */
     public record ProLimits(int maxChannels, int maxPlaylists, int maxDevices) {
     }
 
