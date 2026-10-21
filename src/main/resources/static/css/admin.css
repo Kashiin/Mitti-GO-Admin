@@ -1,0 +1,446 @@
+/* Mitti GO admin — the calm parent register (DESIGN_SYSTEM §1.3, §2): parent ground, white cards with a hairline,
+   one action blue. */
+:root {
+    --ground: #F4F7FB;
+    --card: #FFFFFF;
+    --hairline: #E7EDF5;
+    --divider: #EFF3F8;
+    --ink: #12265C;
+    --ink-2: #456080;
+    --ink-3: #5A7290;
+    --action: #1176E6;
+    --action-ink: #FFFFFF;
+    --focus: #1A8CFF;
+    --selected: #EAF6FF;
+    --success-bg: #E9F9F0;
+    --success-line: #BCEBD2;
+    --success-ink: #0B4B31;
+    --error-bg: #FFF1F1;
+    --error-ink: #A8262C;
+    --error-fill: #C3363B;
+    --amber-bg: #FFF6DF;
+    --amber-line: #F0DCAC;
+    --amber-ink: #3D2C00;
+    --muted-bg: #FAFCFE;
+    --brand: linear-gradient(90deg, #6FD94A, #17D3A7, #1A8CFF);
+    color-scheme: light;
+}
+
+/* Dark: follows the system unless the viewer picked a theme (data-theme on <html>, set by /js/theme.js). */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --ground: #071A2E;
+        --card: #0F2742;
+        --hairline: #1E3A5C;
+        --divider: #16304E;
+        --ink: #EAF6FF;
+        --ink-2: #9FC4DC;
+        --ink-3: #8FA6C4;
+        --action: #3D97FF;
+        --focus: #3D97FF;
+        --selected: #12305A;
+        --success-bg: #123A2C;
+        --success-line: #1E5A44;
+        --success-ink: #57E0A4;
+        --error-bg: #2A1520;
+        --error-ink: #FFB3BC;
+        --error-fill: #C3363B;
+        --amber-bg: #4A3A12;
+        --amber-line: #6B5520;
+        --amber-ink: #FFD97A;
+        --muted-bg: #0B2340;
+        color-scheme: dark;
+    }
+}
+
+:root[data-theme="dark"] {
+    --ground: #071A2E;
+    --card: #0F2742;
+    --hairline: #1E3A5C;
+    --divider: #16304E;
+    --ink: #EAF6FF;
+    --ink-2: #9FC4DC;
+    --ink-3: #8FA6C4;
+    --action: #3D97FF;
+    --focus: #3D97FF;
+    --selected: #12305A;
+    --success-bg: #123A2C;
+    --success-line: #1E5A44;
+    --success-ink: #57E0A4;
+    --error-bg: #2A1520;
+    --error-ink: #FFB3BC;
+    --error-fill: #C3363B;
+    --amber-bg: #4A3A12;
+    --amber-line: #6B5520;
+    --amber-ink: #FFD97A;
+    --muted-bg: #0B2340;
+    color-scheme: dark;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 600 15px/1.5 "Nunito", system-ui, sans-serif;
+}
+
+a { color: var(--action); font-weight: 800; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- Shell ---------------------------------------------------------------------------------------------------------- */
+
+.shell { display: flex; min-height: 100vh; }
+
+.side {
+    width: 248px;
+    flex: none;
+    background: var(--card);
+    border-right: 1px solid var(--hairline);
+    padding: 22px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 18px; }
+.brand-mark { width: 34px; height: 34px; border-radius: 12px; background: var(--brand); flex: none; }
+.brand-name { font: 900 18px/1.1 "Nunito", sans-serif; }
+.brand-sub { font: 700 12px/1.2 "Nunito", sans-serif; color: var(--ink-3); }
+
+.nav-caption {
+    font: 800 12px/1 "Nunito", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--ink-3);
+    padding: 16px 12px 6px;
+}
+
+.nav a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: var(--ink);
+    font-weight: 800;
+}
+
+.nav a:hover { background: var(--ground); text-decoration: none; }
+.nav a.active { background: var(--selected); color: var(--action); }
+
+.side-foot { margin-top: auto; padding: 16px 12px 0; font-size: 13px; color: var(--ink-2); }
+.side-foot form { margin-top: 8px; }
+
+.main { flex: 1; min-width: 0; padding: 32px 40px 48px; }
+.page { max-width: 1280px; }
+
+h1 { font: 900 26px/1.2 "Nunito", sans-serif; margin: 0 0 6px; }
+h2 { font: 900 18px/1.3 "Nunito", sans-serif; margin: 0 0 12px; }
+.lead { color: var(--ink-2); margin: 0 0 24px; max-width: 680px; }
+
+/* --- Cards, grids --------------------------------------------------------------------------------------------------- */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: 24px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+}
+
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 18px; }
+
+.stat {
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: 22px;
+    padding: 18px 20px;
+}
+
+.stat-value { font: 900 28px/1.1 "Nunito", sans-serif; }
+.stat-label { color: var(--ink-2); font-size: 13px; margin-top: 4px; }
+
+meter, progress { width: 100%; height: 10px; margin-top: 10px; }
+
+/* --- Rows ----------------------------------------------------------------------------------------------------------- */
+
+.rows { display: flex; flex-direction: column; }
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-top: 1px solid var(--divider);
+    flex-wrap: wrap;
+}
+
+.row:first-child { border-top: 0; }
+.row.off { opacity: .55; }
+.row-main { flex: 1; min-width: 200px; }
+.row-title { font-weight: 800; }
+.row-sub { color: var(--ink-2); font-size: 13px; overflow-wrap: anywhere; }
+.row-actions { display: flex; gap: 6px; align-items: center; }
+.row-actions form { margin: 0; }
+
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: var(--divider); flex: none; }
+.row-index { min-width: 32px; text-align: right; color: var(--ink-3); font-weight: 700; font-variant-numeric: tabular-nums; flex: none; }
+.pos { width: 28px; text-align: center; color: var(--ink-3); font-weight: 900; }
+
+/* --- Forms ---------------------------------------------------------------------------------------------------------- */
+
+label { display: block; font-weight: 800; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+
+input[type=text], input[type=search], input[type=password], input[type=url], input[type=date], input[type=number], textarea, select {
+    width: 100%;
+    font: 700 15px/1.4 "Nunito", sans-serif;
+    color: var(--ink);
+    background: var(--card);
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+textarea { min-height: 76px; resize: vertical; }
+
+input:focus, textarea:focus, select:focus, button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+}
+
+.form-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.form-line { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.form-line > .grow { flex: 1; min-width: 220px; }
+.field { margin-bottom: 14px; }
+.check { display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--ink); margin: 0; }
+.check input { width: 18px; height: 18px; }
+
+button, .button {
+    font: 800 15px/1 "Nunito", sans-serif;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 18px;
+    cursor: pointer;
+    background: var(--action);
+    color: var(--action-ink);
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+button.secondary { background: var(--ground); color: var(--ink); border: 1px solid var(--hairline); }
+button.small { padding: 8px 12px; min-height: 36px; font-size: 13px; }
+button.danger { background: transparent; color: var(--error-ink); border: 1px solid var(--hairline); }
+button.link { background: none; color: var(--action); padding: 0; min-height: 0; }
+button:disabled { opacity: .45; cursor: default; }
+
+/* --- Messages, pills ------------------------------------------------------------------------------------------------ */
+
+.flash { border-radius: 16px; padding: 12px 16px; margin-bottom: 18px; font-weight: 800; border: 1px solid; }
+.flash.ok { background: var(--success-bg); border-color: var(--success-line); color: var(--success-ink); }
+.flash.err { background: var(--error-bg); border-color: var(--error-ink); color: var(--error-ink); }
+.flash.info { background: var(--selected); border-color: var(--hairline); color: var(--ink); }
+.note { background: var(--muted-bg); border: 1px solid var(--hairline); border-radius: 16px; padding: 12px 16px; color: var(--ink-2); font-size: 14px; }
+.note.amber { background: var(--amber-bg); border-color: var(--amber-line); color: var(--amber-ink); }
+
+.pill { display: inline-block; border-radius: 999px; padding: 3px 10px; font: 800 12px/1.4 "Nunito", sans-serif; background: var(--divider); color: var(--ink-2); }
+.pill.on { background: var(--success-bg); color: var(--success-ink); }
+
+.tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.tabs a { padding: 9px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--hairline); color: var(--ink); }
+.tabs a.active { background: var(--action); border-color: var(--action); color: var(--action-ink); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; color: var(--ink-3); font: 800 12px/1 "Nunito", sans-serif; text-transform: uppercase; letter-spacing: .04em; padding: 0 8px 10px; }
+td { padding: 10px 8px; border-top: 1px solid var(--divider); vertical-align: top; }
+.muted { color: var(--ink-3); }
+
+/* --- Login ---------------------------------------------------------------------------------------------------------- */
+
+.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login { width: 100%; max-width: 400px; }
+.login .brand { justify-content: center; padding-bottom: 22px; }
+.login button { width: 100%; margin-top: 6px; }
+.login-foot { text-align: center; color: var(--ink-3); font-size: 13px; margin-top: 14px; }
+
+/* --- Narrow windows ------------------------------------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+    .shell { flex-direction: column; }
+    .side { width: auto; border-right: 0; border-bottom: 1px solid var(--hairline); padding: 14px 16px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .nav-caption { display: none; }
+    .side-foot { padding: 10px 0 0; }
+    .main { padding: 22px 16px 40px; }
+}
+
+/* --- Theme switch ------------------------------------------------------------------------------------------------- */
+
+.theme-switch { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--ground); border: 1px solid var(--hairline); }
+.theme-switch button { background: transparent; color: var(--ink-2); padding: 6px 10px; min-height: 32px; font-size: 12px; border-radius: 999px; }
+.theme-switch button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(9, 26, 52, .18); }
+.side-foot .theme-switch { margin-bottom: 12px; }
+.login .theme-switch { display: flex; width: max-content; margin: 16px auto 0; }
+.login .theme-switch button { width: auto; margin-top: 0; }
+
+/* A fixed, non-editable start of a value (promo codes: MITTI-). */
+.input-prefix {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--hairline);
+    border-radius: 14px;
+    background: var(--card);
+    overflow: hidden;
+}
+.input-prefix:focus-within { outline: 2px solid var(--focus); outline-offset: 1px; }
+.input-prefix span {
+    display: flex;
+    align-items: center;
+    padding: 0 4px 0 12px;
+    font: 800 15px/1 "Nunito", sans-serif;
+    color: var(--ink);
+    background: var(--muted-bg);
+    user-select: none;
+}
+.input-prefix input { border: 0; border-radius: 0; text-transform: uppercase; }
+.input-prefix input:focus { outline: none; }
+.hint { display: block; margin-top: 6px; font-size: 12px; color: var(--ink-3); }
+
+/* Small icon button (copy a promo code). */
+.code-line { display: flex; align-items: center; gap: 6px; }
+.icon-button {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ink-3);
+    border: 1px solid transparent;
+}
+.icon-button:hover { background: var(--ground); color: var(--action); border-color: var(--hairline); }
+.icon-button svg { width: 18px; height: 18px; fill: currentColor; }
+.icon-button .icon-check { display: none; }
+.icon-button.copied { color: var(--success-ink); }
+.icon-button.copied .icon-copy { display: none; }
+.icon-button.copied .icon-check { display: block; }
+
+/* A long table scrolls inside its card; the header stays on top. */
+.table-scroll { max-height: max(240px, calc(100vh - 240px)); overflow: auto; margin: 0 -8px; padding: 0 8px; }
+.table-scroll thead th { position: sticky; top: 0; z-index: 1; background: var(--card); padding-top: 4px; box-shadow: inset 0 -1px 0 var(--divider); }
+.table-scroll td { white-space: normal; }
+.table-scroll td:first-child { white-space: nowrap; }
+
+/* Confirmation dialog. */
+.modal {
+    width: min(440px, calc(100vw - 32px));
+    border: 1px solid var(--hairline);
+    border-radius: 26px;
+    padding: 24px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 24px 60px rgba(9, 26, 52, .28);
+}
+.modal::backdrop { background: rgba(9, 26, 52, .42); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .modal::backdrop { background: rgba(2, 8, 18, .62); } }
+:root[data-theme="dark"] .modal::backdrop { background: rgba(2, 8, 18, .62); }
+.modal h2 { margin-bottom: 8px; }
+.modal-code { font: 900 20px/1.3 "Nunito", sans-serif; margin: 0 0 14px; word-break: break-all; }
+.modal-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0 0 14px; font-size: 14px; }
+.modal-facts dt { color: var(--ink-3); font-weight: 700; }
+.modal-facts dd { margin: 0; font-weight: 800; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+button.danger-fill { background: var(--error-fill); color: #FFFFFF; }
+
+/* Two cards side by side on wide screens (Active | Archive), stacked on narrow ones. */
+.split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.split > .card { margin-bottom: 18px; }
+.split .row-actions { flex-wrap: wrap; }
+@media (max-width: 1100px) { .split { grid-template-columns: 1fr; gap: 0; } }
+/* Long lists scroll inside their card instead of stretching the page. */
+.split .rows { max-height: calc(100vh - 260px); overflow-y: auto; margin-right: -10px; padding-right: 10px; }
+
+/* Long channel lists scroll inside their card. */
+.rows-scroll { max-height: max(240px, calc(100vh - 220px)); overflow-y: auto; margin-right: -10px; padding-right: 10px; }
+a.button { display: inline-flex; align-items: center; text-decoration: none; }
+a.button:hover { text-decoration: none; }
+input[type=file] { font: 700 14px/1.4 "Nunito", sans-serif; color: var(--ink-2); }
+
+/* A list with its tools in a column on the right (Каналы); one column on narrow windows. */
+.page-wide { max-width: 1680px; }
+.page-full { max-width: none; }
+.aside-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 18px; align-items: start; }
+.aside-layout > .card, .aside > .card { margin-bottom: 18px; }
+.aside .row-actions { flex-wrap: wrap; }
+@media (max-width: 1200px) { .aside-layout { grid-template-columns: 1fr; gap: 0; } .aside { order: -1; } }
+.sub-heading { margin-top: 22px; }
+
+/* Search field (Пользователи): a magnifier inside the field, the browser's own clear cross hidden. */
+.search { position: relative; }
+.search input[type=search] { padding-left: 40px; min-height: 46px; }
+.search::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    background: var(--ink-3);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 16q-2.73 0-4.61-1.89T3 9.5t1.89-4.61T9.5 3t4.61 1.89T16 9.5q0 1.1-.35 2.07t-.95 1.73l5.6 5.6q.28.28.28.7t-.28.7t-.7.28t-.7-.28l-5.6-5.6q-.75.6-1.72.95T9.5 16m0-2q1.88 0 3.19-1.31T14 9.5t-1.31-3.19T9.5 5T6.31 6.31T5 9.5t1.31 3.19T9.5 14'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 16q-2.73 0-4.61-1.89T3 9.5t1.89-4.61T9.5 3t4.61 1.89T16 9.5q0 1.1-.35 2.07t-.95 1.73l5.6 5.6q.28.28.28.7t-.28.7t-.7.28t-.7-.28l-5.6-5.6q-.75.6-1.72.95T9.5 16m0-2q1.88 0 3.19-1.31T14 9.5t-1.31-3.19T9.5 5T6.31 6.31T5 9.5t1.31 3.19T9.5 14'/%3E%3C/svg%3E") center / contain no-repeat;
+    pointer-events: none;
+}
+input[type=search]::-webkit-search-cancel-button, input[type=search]::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+input[type=search]::placeholder { color: var(--ink-3); font-weight: 600; }
+.search-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.search-form .field { flex: 1; min-width: 240px; margin-bottom: 0; }
+.search-form button { min-height: 46px; }
+/* Our own clear button: it drops the search, not just the typed text. */
+.search input[type=search] { padding-right: 44px; }
+.search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--ink-3);
+    font: 800 20px/1 "Nunito", sans-serif;
+    text-decoration: none;
+}
+.search-clear:hover { background: var(--hairline); color: var(--ink); text-decoration: none; }
+
+/* Пользователи: "Изменить срок" opens a small form under the row. */
+.pro-edit { position: relative; }
+.pro-edit > summary { list-style: none; cursor: pointer; }
+.pro-edit > summary::-webkit-details-marker { display: none; }
+.pro-edit-form {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 5;
+    min-width: 260px;
+    padding: 14px;
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(9, 26, 52, .18);
+    display: grid;
+    gap: 10px;
+}
+.pro-edit-form .field { margin-bottom: 0; }
+.modal-option { margin-top: 12px; }
+.small-note { font-size: 13px; margin-top: 6px; }
+
+/* Категории (C50): a video's YouTube picture with its length. */
+.video-thumb { position: relative; flex: 0 0 auto; width: 120px; height: 68px; border-radius: 10px; overflow: hidden; background: var(--divider); display: block; }
+.video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video-duration { position: absolute; right: 6px; bottom: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(0, 0, 0, .65); color: #fff; font: 800 11px/1.4 "Nunito", sans-serif; }

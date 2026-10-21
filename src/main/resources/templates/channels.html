@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Каналы')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page page-wide">
+            <h1>Каналы</h1>
+            <p class="lead">Официальные каналы по языкам. Список загружается файлом: сервер проверяет каждую строку в YouTube
+                и не добавляет дубликаты. Данные каналов (название, аватар) попадают в наш кэш.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card" th:if="${problems != null and !#lists.isEmpty(problems)}">
+                <h2>Не добавлено <span class="muted" th:text="'· ' + ${#lists.size(problems)}">· 0</span></h2>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>Язык</th><th>Строка</th><th>Что было в файле</th><th>Причина</th></tr></thead>
+                        <tbody>
+                        <tr th:each="p : ${problems}">
+                            <td th:text="${p.language}">ENG</td>
+                            <td th:text="${p.row}">1</td>
+                            <td th:text="${p.input}">…</td>
+                            <td th:text="${p.reason == 'channel not found on YouTube'} ? 'канал не найден в YouTube'
+                                       : (${p.reason == 'a playlist, not a channel'} ? 'это плейлист, а не канал'
+                                       : (${p.reason == 'not a link, @handle or channel id'} ? 'не ссылка, не @handle и не ID канала'
+                                       : (${p.reason == 'too long'} ? 'слишком длинная строка'
+                                       : (${p.reason.startsWith('YouTube quota')} ? 'квота YouTube закончилась — повторите позже' : 'не удалось проверить'))))">причина</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <a th:each="lang : ${languages}" th:href="@{/channels(language=${lang})}"
+                   th:classappend="${lang == language} ? 'active'"
+                   th:text="${lang == 'en'} ? 'ENG' : (${lang == 'ru'} ? 'RU' : 'UZB')">ENG</a>
+            </div>
+
+            <div class="aside-layout">
+                <div class="card">
+                <h2>Список <span class="muted" th:text="'· ' + ${#lists.size(items)}">· 0</span></h2>
+                <p class="muted" th:if="${#lists.isEmpty(items)}">Пока пусто — загрузите файл.</p>
+                <div class="rows rows-scroll">
+                    <div class="row" th:each="item, stat : ${items}">
+                        <span class="row-index" th:text="${stat.count}">1</span>
+                        <img class="avatar" th:if="${item.channel != null and item.channel.thumbnailUrl != null}"
+                             th:src="${item.channel.thumbnailUrl}" alt="" referrerpolicy="no-referrer">
+                        <div class="avatar" th:unless="${item.channel != null and item.channel.thumbnailUrl != null}"></div>
+                        <div class="row-main">
+                            <div class="row-title" th:text="${item.channel != null} ? ${item.channel.title} : ${item.channelId}">Канал</div>
+                            <div class="row-sub">
+                                <span th:if="${item.channel != null and item.channel.handle != null}" th:text="${item.channel.handle} + ' · '"></span>
+                                <a th:href="'https://www.youtube.com/channel/' + ${item.channelId}" target="_blank" rel="noopener noreferrer"
+                                   th:text="${item.channelId}">UC…</a>
+                                <span th:if="${item.addedAt != null}" th:text="' · добавлен ' + ${#temporals.format(item.addedAt, 'dd.MM.yyyy')}"></span>
+                            </div>
+                        </div>
+                        <form th:action="@{/channels/{id}/delete(id=${item.id})}" method="post">
+                            <input type="hidden" name="language" th:value="${language}">
+                            <button class="danger small">Убрать</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+                <div class="aside">
+                    <div class="card">
+                    <h2>Импорт</h2>
+                    <p class="muted">Файл Excel (.xlsx), CSV или JSON со ссылками на каналы, @handle или ID (UC…) — колонка находится сама, где бы ни начиналась таблица. Если в Excel листы названы по языкам (Английский / Русский / Узбекский), каждый лист попадёт в свой язык. Иначе — в выбранный таб. До 500 строк на язык.
+                    </p>
+                    <form th:action="@{/channels/import}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="language" th:value="${language}">
+                        <div class="field">
+                            <label for="file">Файл</label>
+                            <input id="file" name="file" type="file" accept=".xlsx,.xls,.csv,.json" required>
+                        </div>
+                        <button type="submit">Импортировать</button>
+                    </form>
+                    <p class="hint">Шаблон:
+                        <a th:href="@{/channels/template(format='xlsx')}">Excel</a> ·
+                        <a th:href="@{/channels/template(format='csv')}">CSV</a> ·
+                        <a th:href="@{/channels/template(format='json')}">JSON</a></p>
+                </div>
+
+                <div class="card">
+                    <h2>Экспорт</h2>
+                    <p class="muted">Скачать список этого языка: ID, название, @handle, ссылка, дата добавления.</p>
+                    <div class="row-actions">
+                        <a class="button" th:href="@{/channels/export(language=${language}, format='xlsx')}">Excel</a>
+                        <a class="button" th:href="@{/channels/export(language=${language}, format='csv')}">CSV</a>
+                        <a class="button" th:href="@{/channels/export(language=${language}, format='json')}">JSON</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

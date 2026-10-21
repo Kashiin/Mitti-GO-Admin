@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title th:text="${title} + ' · Mitti GO Admin'">Mitti GO Admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+    <script src="/js/theme.js"></script>
+    <script src="/js/copy.js" defer></script>
+    <script src="/js/confirm-delete.js" defer></script>
+    <script src="/js/rows-limit.js" defer></script>
+</head>
+<body>
+
+<aside class="side" th:fragment="side">
+    <div class="brand">
+        <div class="brand-mark"></div>
+        <div>
+            <div class="brand-name">Mitti GO</div>
+            <div class="brand-sub">Админка</div>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <a href="/" th:classappend="${path == '/'} ? 'active'">Обзор</a>
+        <div class="nav-caption">Семьи</div>
+        <a href="/users" th:classappend="${path == '/users'} ? 'active'">Пользователи</a>
+        <div class="nav-caption">Контент</div>
+        <a href="/recommendations" th:classappend="${path == '/recommendations'} ? 'active'">Рекомендации</a>
+        <a href="/channels" th:classappend="${path == '/channels'} ? 'active'">Каналы</a>
+        <a href="/categories" th:classappend="${path != null and #strings.startsWith(path, '/categories')} ? 'active'">Категории</a>
+        <div class="nav-caption">Приложение</div>
+        <a href="/prices" th:classappend="${path == '/prices'} ? 'active'">Цены Pro</a>
+        <a href="/promo-codes" th:classappend="${path == '/promo-codes'} ? 'active'">Промокоды</a>
+        <a href="/contacts" th:classappend="${path == '/contacts'} ? 'active'">Контакты поддержки</a>
+        <a href="/release-notes" th:classappend="${path == '/release-notes'} ? 'active'">Что нового</a>
+        <a href="/legal" th:classappend="${path == '/legal'} ? 'active'">Юридические ссылки</a>
+        <a href="/settings" th:classappend="${path == '/settings'} ? 'active'">Настройки</a>
+        <div class="nav-caption">Админка</div>
+        <a href="/audit" th:classappend="${path == '/audit'} ? 'active'">Журнал изменений</a>
+        <a href="/admins" th:classappend="${path == '/admins'} ? 'active'">Администраторы</a>
+        <a href="/account" th:classappend="${path == '/account'} ? 'active'">Мой пароль</a>
+    </nav>
+
+    <div class="side-foot">
+        <div th:replace="~{fragments :: theme}"></div>
+        Вы вошли как <b th:text="${adminLogin}">owner</b>
+        <form th:action="@{/logout}" method="post">
+            <button class="secondary small" type="submit">Выйти</button>
+        </form>
+    </div>
+</aside>
+
+<div class="theme-switch" role="group" aria-label="Тема" th:fragment="theme">
+    <button type="button" data-theme-choice="auto" aria-pressed="true">Авто</button>
+    <button type="button" data-theme-choice="light" aria-pressed="false">Светлая</button>
+    <button type="button" data-theme-choice="dark" aria-pressed="false">Тёмная</button>
+</div>
+
+<div th:fragment="flash">
+    <div class="flash ok" th:if="${success}" th:text="${success}" role="status"></div>
+    <div class="flash err" th:if="${error}" th:text="${error}" role="alert"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Промокоды')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page page-full">
+            <h1>Промокоды</h1>
+            <p class="lead">Родитель вводит код в приложении (Родителям → Промокод) и получает Pro на выбранный срок. Если Pro уже
+                есть — срок добавляется к оставшемуся; «Навсегда» перекрывает всё. Один код на одном телефоне работает один раз.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <h2>Новый промокод</h2>
+                <form th:action="@{/promo-codes}" method="post">
+                    <div class="field">
+                        <label>Срок Pro</label>
+                        <div class="tabs">
+                            <label class="check" th:each="p, st : ${periods}">
+                                <input type="radio" name="period" th:value="${p.id}" th:checked="${st.first}" required>
+                                <span th:text="${p.label}">1 месяц</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="code">Код (пусто — сгенерировать)</label>
+                            <div class="input-prefix">
+                                <span aria-hidden="true">MITTI-</span>
+                                <input id="code" name="code" type="text" maxlength="26" placeholder="XXXX-XXXX"
+                                       pattern="[A-Za-z0-9][A-Za-z0-9-]{3,25}" aria-describedby="code-hint"
+                                       title="После MITTI-: 4–26 символов — латинские буквы, цифры и дефис">
+                            </div>
+                            <span id="code-hint" class="hint">Все коды начинаются с MITTI- — это не меняется.</span>
+                        </div>
+                        <div class="field">
+                            <label for="maxRedemptions">Сколько раз можно активировать (пусто — без лимита)</label>
+                            <input id="maxRedemptions" name="maxRedemptions" type="number" min="1" max="1000000" placeholder="без лимита">
+                        </div>
+                        <div class="field">
+                            <label for="validUntil">Действует до (включительно, пусто — бессрочно)</label>
+                            <input id="validUntil" name="validUntil" type="date">
+                        </div>
+                        <div class="field">
+                            <label for="note">Заметка для себя</label>
+                            <input id="note" name="note" type="text" maxlength="200" placeholder="Например: блогер, акция">
+                        </div>
+                    </div>
+                    <button type="submit">Создать промокод</button>
+                </form>
+            </div>
+
+            <div class="split">
+            <div class="card">
+                <h2>Активные <span class="muted" th:text="'· ' + ${#lists.size(activeCodes)}">· 0</span></h2>
+                <p class="muted" th:if="${#lists.isEmpty(activeCodes)}">Нет кодов, которые сейчас можно ввести.</p>
+                <div class="rows rows-scroll">
+                    <th:block th:each="c : ${activeCodes}">
+                        <div th:replace="~{::promoRow(${c})}"></div>
+                    </th:block>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Архив <span class="muted" th:text="'· ' + ${#lists.size(archivedCodes)}">· 0</span></h2>
+                <p class="muted">Исчерпанные, истёкшие и выключенные коды. Их больше нельзя ввести; выключенный можно включить снова.</p>
+                <p class="muted" th:if="${#lists.isEmpty(archivedCodes)}">Пока пусто.</p>
+                <div class="rows rows-scroll">
+                    <th:block th:each="c : ${archivedCodes}">
+                        <div th:replace="~{::promoRow(${c})}"></div>
+                    </th:block>
+                </div>
+            </div>
+            </div>
+
+            <dialog class="modal" id="confirm-delete" aria-labelledby="confirm-delete-title">
+                <h2 id="confirm-delete-title">Удалить промокод?</h2>
+                <p class="modal-code" data-field="code">MITTI-XXXX-XXXX</p>
+                <dl class="modal-facts">
+                    <dt>Срок Pro</dt><dd data-field="period"></dd>
+                    <dt>Действует</dt><dd data-field="valid"></dd>
+                    <dt>Активаций</dt><dd data-field="activations"></dd>
+                    <dt>Статус</dt><dd data-field="status"></dd>
+                </dl>
+                <p class="muted">Код пропадёт насовсем: родители больше не смогут его ввести. Отменить удаление нельзя.
+                    История активаций сохранится.</p>
+                <label class="check modal-option"><input type="checkbox" data-option="revokePro"> Забрать Pro, который дал этот код</label>
+                <p class="muted small-note">Без галочки уже выданный Pro останется до своей даты. С галочкой срок у каждого, кто вводил код,
+                    пересчитается без него: если других кодов не было — сразу Free.</p>
+                <div class="modal-actions">
+                    <button type="button" class="secondary" data-action="cancel">Отмена</button>
+                    <button type="button" class="danger-fill" data-action="confirm">Удалить</button>
+                </div>
+            </dialog>
+
+            <p class="note">Удалить можно любой код. Какие телефоны активировали код, не показывается (приватность).</p>
+        </div>
+    </main>
+</div>
+
+<!-- One promo code row, used by both sections; the block itself never renders. -->
+<th:block th:if="${false}">
+<div class="row" th:fragment="promoRow(c)" th:classappend="${!c.isWorking()} ? 'off'">
+    <div class="row-main">
+        <div class="row-title code-line">
+            <span th:text="${c.code}">MITTI-ABCD-EFGH</span>
+            <button type="button" class="icon-button" th:attr="data-copy=${c.code}" aria-label="Скопировать код" title="Скопировать">
+                <svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18q-.825 0-1.412-.587T7 16V4q0-.825.588-1.412T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.587 1.413T18 18zm-4 4q-.825 0-1.412-.587T3 20V7q0-.425.288-.712T4 6t.713.288T5 7v13h10q.425 0 .713.288T16 21t-.288.713T15 22z"/></svg>
+                <svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m9.55 15.15 8.475-8.475q.3-.3.7-.3t.7.3t.3.713t-.3.712l-9.175 9.2q-.3.3-.7.3t-.7-.3L4.55 13q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3z"/></svg>
+            </button>
+        </div>
+        <div class="row-sub">
+            <span th:text="${periodLabels[c.period]}">3 месяца</span>
+            · активировано <b th:text="${c.redeemedCount}">0</b>
+            <span th:text="${c.maxRedemptions != null} ? ' из ' + ${c.maxRedemptions} : ' (без лимита)'"></span>
+            <span th:if="${c.validUntil != null}" th:text="' · до ' + ${#temporals.format(c.validUntil, 'dd.MM.yyyy')}"></span>
+            <span th:if="${c.lastRedeemedAt != null}" th:text="' · последняя ' + ${#temporals.format(c.lastRedeemedAt, 'dd.MM HH:mm')}"></span>
+            <span th:if="${c.note != null}" th:text="' · ' + ${c.note}"></span>
+        </div>
+    </div>
+    <span class="pill" th:classappend="${c.isWorking()} ? 'on'" th:text="${c.status()}">Активен</span>
+    <div class="row-actions">
+        <form th:action="@{/promo-codes/{id}/active(id=${c.id})}" method="post">
+            <input type="hidden" name="active" th:value="${!c.isActive()}">
+            <button class="secondary small" th:text="${c.isActive()} ? 'Выключить' : 'Включить'">Выключить</button>
+        </form>
+        <form th:action="@{/promo-codes/{id}/delete(id=${c.id})}" method="post"
+              data-confirm-delete
+              th:attr="data-code=${c.code},
+                       data-period=${periodLabels[c.period]},
+                       data-activations=${c.redeemedCount} + (${c.maxRedemptions != null} ? ' из ' + ${c.maxRedemptions} : ' (без лимита)'),
+                       data-valid=${c.validUntil != null} ? 'до ' + ${#temporals.format(c.validUntil, 'dd.MM.yyyy')} + ' включительно' : 'бессрочно',
+                       data-status=${c.status()}">
+            <input type="hidden" name="code" th:value="${c.code}">
+            <input type="hidden" name="revokePro" value="false">
+            <button class="danger small">Удалить</button>
+        </form>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

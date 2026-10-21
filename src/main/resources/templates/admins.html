@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Администраторы')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Администраторы</h1>
+            <p class="lead">Кто может входить в админку. Каждое действие подписывается логином — его видно в «Журнале изменений».</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="split">
+                <div class="card">
+                    <h2>Учётные записи <span class="muted" th:text="'· ' + ${#lists.size(admins)}">· 0</span></h2>
+                    <div class="rows rows-scroll">
+                        <div class="row" th:each="a : ${admins}">
+                            <div class="row-main">
+                                <div class="row-title">
+                                    <span th:text="${a.login}">owner</span>
+                                    <span class="pill on" th:if="${a.isMain()}">Главный</span>
+                                    <span class="muted" th:if="${a.isMe()}">· это вы</span>
+                                </div>
+                                <div class="row-sub" th:text="${a.lastLogin != null} ? 'последний вход ' + ${a.lastLogin} : 'ещё не входил'">ещё не входил</div>
+                            </div>
+                            <span class="pill" th:classappend="${a.isActive()} ? 'on'" th:text="${a.isActive()} ? 'Может входить' : 'Отключён'">Может входить</span>
+                            <div class="row-actions" th:if="${canManage and !a.isMain()}">
+                                <form th:action="@{/admins/{id}/active(id=${a.id})}" method="post">
+                                    <input type="hidden" name="active" th:value="${!a.isActive()}">
+                                    <input type="hidden" name="login" th:value="${a.login}">
+                                    <button class="small" th:classappend="${a.isActive()} ? 'danger'" th:text="${a.isActive()} ? 'Отключить' : 'Включить'">Отключить</button>
+                                </form>
+                                <form th:action="@{/admins/{id}/delete(id=${a.id})}" method="post" data-confirm-delete th:data-code="${a.login}">
+                                    <input type="hidden" name="login" th:value="${a.login}">
+                                    <button class="small danger">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" th:if="${canManage}">
+                    <h2>Новый администратор</h2>
+                    <p class="muted">Логин — латинские буквы, цифры, точка, _ или -. Пароль минимум 12 символов; потом его можно сменить в «Мой пароль». Передайте логин и пароль лично, не в чате.</p>
+                    <form th:action="@{/admins}" method="post">
+                        <div class="field">
+                            <label for="login">Логин</label>
+                            <input id="login" name="login" type="text" autocomplete="off" minlength="3" maxlength="50"
+                                   pattern="[A-Za-z0-9._\-]{3,50}" th:value="${login}" required>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="password">Пароль</label>
+                                <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" required>
+                            </div>
+                            <div class="field">
+                                <label for="repeatPassword">Повторите</label>
+                                <input id="repeatPassword" name="repeatPassword" type="password" autocomplete="new-password" minlength="12" required>
+                            </div>
+                        </div>
+                        <button type="submit">Создать</button>
+                    </form>
+                </div>
+            </div>
+
+            <p class="note" th:unless="${canManage}">Добавлять, отключать и удалять администраторов может только главный администратор.</p>
+
+            <dialog class="modal" id="confirm-delete" aria-labelledby="confirm-delete-title">
+                <h2 id="confirm-delete-title">Удалить администратора?</h2>
+                <p class="modal-code" data-field="code">login</p>
+                <p class="muted">Он больше не сможет войти, его сессии завершатся. Его записи в журнале останутся с пометкой «удалённый админ». Отменить нельзя.</p>
+                <div class="modal-actions">
+                    <button type="button" class="secondary" data-action="cancel">Отмена</button>
+                    <button type="button" class="danger-fill" data-action="confirm">Удалить</button>
+                </div>
+            </dialog>
+        </div>
+    </main>
+</div>
+</body>
+</html>

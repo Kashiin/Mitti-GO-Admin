@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Контакты поддержки')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Контакты поддержки</h1>
+            <p class="lead">Экран «Поддержка» в родительской зоне. Пустой контакт в приложении просто не показывается. Почта также
+                используется для «Сообщить о проблеме».</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <div class="rows rows-scroll">
+                    <form class="row" th:each="t : ${types}" th:action="@{/contacts/{type}(type=${t.type})}" method="post">
+                        <div class="row-main">
+                            <div class="row-title" th:text="${t.label}">Почта</div>
+                            <span class="pill" th:classappend="${saved[t.type] != null} ? 'on'"
+                                  th:text="${saved[t.type] != null} ? 'В приложении' : 'Не задан'">Не задан</span>
+                        </div>
+                        <div>
+                            <label th:for="'v' + ${t.type}">Что показать</label>
+                            <input th:id="'v' + ${t.type}" name="value" type="text" maxlength="200"
+                                   th:value="${saved[t.type] != null} ? ${saved[t.type].value} : ''">
+                        </div>
+                        <div th:if="${t.uriHint != null}">
+                            <label th:for="'u' + ${t.type}">Ссылка при нажатии</label>
+                            <input th:id="'u' + ${t.type}" name="uri" type="text" maxlength="500" th:placeholder="${t.uriHint}"
+                                   th:value="${saved[t.type] != null} ? ${saved[t.type].uri} : ''">
+                        </div>
+                        <button class="small" type="submit">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+            <p class="note">Чтобы убрать контакт, очистите поле «Что показать» и сохраните.</p>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Вход')}"></head>
+<body>
+<main class="login-wrap">
+    <div class="login">
+        <div class="brand">
+            <div class="brand-mark"></div>
+            <div>
+                <div class="brand-name">Mitti GO</div>
+                <div class="brand-sub">Админка</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Вход</h2>
+            <div class="flash err" th:if="${error}" th:text="${error}" role="alert"></div>
+            <div class="flash info" th:if="${info}" th:text="${info}" role="status"></div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <label for="username">Логин</label>
+                    <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+                </div>
+                <div class="field">
+                    <label for="password">Пароль</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+
+        <p class="login-foot">После 5 неверных попыток вход блокируется на 15 минут.</p>
+        <div th:replace="~{fragments :: theme}"></div>
+    </div>
+</main>
+</body>
+</html>

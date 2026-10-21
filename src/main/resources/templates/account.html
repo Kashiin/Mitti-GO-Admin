@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Мой пароль')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Мой пароль</h1>
+            <p class="lead">Минимум 12 символов. После смены все другие ваши сессии завершатся.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <form th:action="@{/account/password}" method="post">
+                    <div class="field">
+                        <label for="currentPassword">Текущий пароль</label>
+                        <input id="currentPassword" name="currentPassword" type="password" autocomplete="current-password" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="newPassword">Новый пароль</label>
+                            <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" minlength="12" required>
+                        </div>
+                        <div class="field">
+                            <label for="repeatPassword">Повторите</label>
+                            <input id="repeatPassword" name="repeatPassword" type="password" autocomplete="new-password" minlength="12" required>
+                        </div>
+                    </div>
+                    <button type="submit">Сменить пароль</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Юридические ссылки')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Юридические ссылки</h1>
+            <p class="lead">Экран «О приложении». Пока ссылки нет, пункт скрыт. Карточка «Видео с YouTube» показывается всегда.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <div class="rows rows-scroll">
+                    <form class="row" th:each="k : ${keys}" th:action="@{/legal/{key}(key=${k.key})}" method="post">
+                        <div class="row-main">
+                            <label th:for="${k.key}" th:text="${k.label}">Политика</label>
+                            <input th:id="${k.key}" name="url" type="url" maxlength="500" placeholder="https://mitti-go.uz/…"
+                                   th:value="${saved[k.key]}">
+                        </div>
+                        <button class="small" type="submit">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+            <p class="note">Только https. Чтобы убрать ссылку, очистите поле и сохраните.</p>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Категория')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <p><a th:href="@{/categories}">← Все категории</a></p>
+            <h1 th:text="${topic != null} ? ${topic.titleRu} : ${code}">Цвета</h1>
+            <p class="lead" th:if="${topic != null}"
+               th:text="${topic.titleUz} + ' · ' + ${topic.titleEn} + ' — RU ' + ${topic.ru} + ', UZ ' + ${topic.uz} + ', EN ' + ${topic.en} + ' видео'">Ranglar · Colors</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="tabs">
+                <a th:href="@{/categories/{code}(code=${code},query=${query})}" th:classappend="${language.isEmpty()} ? 'active'">Все языки</a>
+                <a th:href="@{/categories/{code}(code=${code},language='ru',query=${query})}" th:classappend="${language == 'ru'} ? 'active'">Русский</a>
+                <a th:href="@{/categories/{code}(code=${code},language='uz',query=${query})}" th:classappend="${language == 'uz'} ? 'active'">O‘zbekcha</a>
+                <a th:href="@{/categories/{code}(code=${code},language='en',query=${query})}" th:classappend="${language == 'en'} ? 'active'">English</a>
+            </div>
+
+            <div class="card">
+                <form method="get" th:action="@{/categories/{code}(code=${code})}" class="search-form">
+                    <input type="hidden" name="language" th:value="${language}">
+                    <div class="field">
+                        <label for="query">Название или канал</label>
+                        <div class="search">
+                            <input id="query" name="query" type="search" autocomplete="off" maxlength="120" th:value="${query}" placeholder="Например, Малышарики">
+                            <a class="search-clear" th:if="${!query.isEmpty()}" th:href="@{/categories/{code}(code=${code},language=${language})}"
+                               title="Сбросить поиск" aria-label="Сбросить поиск">×</a>
+                        </div>
+                    </div>
+                    <button type="submit">Найти</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Видео <span class="muted" th:text="'· ' + ${total}">· 0</span></h2>
+                <p class="muted" th:if="${#lists.isEmpty(videos)}">Ничего не нашлось.</p>
+                <div class="rows">
+                    <div class="row" th:each="v : ${videos}">
+                        <a class="video-thumb" th:href="${v.link}" target="_blank" rel="noopener">
+                            <img th:src="${v.thumbnail}" alt="" loading="lazy">
+                            <span class="video-duration" th:if="${v.duration != null}" th:text="${v.duration}">4:52</span>
+                        </a>
+                        <div class="row-main">
+                            <div class="row-title">
+                                <a th:href="${v.link}" target="_blank" rel="noopener" th:text="${v.title}">Название</a>
+                            </div>
+                            <div class="row-sub">
+                                <span th:text="${v.language}">RU</span>
+                                <span th:if="${v.channel != null}" th:text="' · ' + ${v.channel}"> · Канал</span>
+                                <span th:if="${v.kind != null}" th:text="' · ' + ${v.kind}"> · Песенка</span>
+                            </div>
+                        </div>
+                        <span class="pill" th:classappend="${v.active} ? 'on'" th:text="${v.active} ? 'Видно' : 'Скрыто'">Видно</span>
+                        <div class="row-actions">
+                            <form th:action="@{/categories/{code}/videos/{id}/active(code=${code},id=${v.id})}" method="post">
+                                <input type="hidden" name="active" th:value="${!v.active}">
+                                <input type="hidden" name="language" th:value="${language}">
+                                <input type="hidden" name="query" th:value="${query}">
+                                <input type="hidden" name="page" th:value="${page}">
+                                <button class="small" th:classappend="${v.active} ? 'danger'" th:text="${v.active} ? 'Скрыть' : 'Показать'">Скрыть</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-actions" th:if="${hasPrevious or hasNext}">
+                    <a class="button small secondary" th:if="${hasPrevious}"
+                       th:href="@{/categories/{code}(code=${code},language=${language},query=${query},page=${page - 1})}">← Назад</a>
+                    <span class="muted" th:text="'Страница ' + ${page + 1} + ' из ' + ${pages}">Страница 1</span>
+                    <a class="button small secondary" th:if="${hasNext}"
+                       th:href="@{/categories/{code}(code=${code},language=${language},query=${query},page=${page + 1})}">Дальше →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Рекомендации')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Рекомендованные каналы</h1>
+            <p class="lead">Показываются на шаге 3 настройки и в «Добавить канал», на выбранном родителем языке. Порядок здесь —
+                порядок в приложении. Изменения видны без обновления приложения.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="tabs">
+                <a th:each="lang : ${languages}" th:href="@{/recommendations(language=${lang})}"
+                   th:classappend="${lang == language} ? 'active'"
+                   th:text="${lang == 'ru'} ? 'Русский' : (${lang == 'uz'} ? 'O‘zbekcha' : 'English')">Русский</a>
+            </div>
+
+            <div class="card">
+                <h2>Добавить канал</h2>
+                <form class="form-line" th:action="@{/recommendations}" method="post">
+                    <input type="hidden" name="language" th:value="${language}">
+                    <div class="grow">
+                        <label for="channel">Ссылка на канал, @handle или ID (UC…)</label>
+                        <input id="channel" name="channel" type="text" required maxlength="200"
+                               placeholder="https://www.youtube.com/@cocomelon">
+                    </div>
+                    <button type="submit">Добавить</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2><span th:text="${#lists.size(items)}">0</span> каналов</h2>
+                <p class="muted" th:if="${#lists.isEmpty(items)}">Для этого языка списка нет — в приложении будет «Рекомендаций пока нет».</p>
+
+                <div class="rows rows-scroll">
+                    <div class="row" th:each="item, stat : ${items}" th:classappend="${!item.isActive()} ? 'off'">
+                        <div class="pos" th:text="${stat.count}">1</div>
+                        <img class="avatar" th:if="${item.channel != null and item.channel.thumbnailUrl != null}"
+                             th:src="${item.channel.thumbnailUrl}" alt="" referrerpolicy="no-referrer">
+                        <div class="avatar" th:unless="${item.channel != null and item.channel.thumbnailUrl != null}"></div>
+                        <div class="row-main">
+                            <div class="row-title" th:text="${item.channel != null} ? ${item.channel.title} : ${item.channelId}">Канал</div>
+                            <div class="row-sub">
+                                <span th:if="${item.channel != null and item.channel.handle != null}" th:text="${item.channel.handle} + ' · '"></span>
+                                <a th:href="'https://www.youtube.com/channel/' + ${item.channelId}" target="_blank" rel="noopener noreferrer"
+                                   th:text="${item.channelId}">UC…</a>
+                                <span th:if="${item.channel != null and item.channel.videoCount != null}"
+                                      th:text="' · ' + ${item.channel.videoCount} + ' видео'"></span>
+                            </div>
+                        </div>
+                        <span class="pill" th:classappend="${item.isActive()} ? 'on'" th:text="${item.isActive()} ? 'Показывается' : 'Скрыт'">Показывается</span>
+                        <div class="row-actions">
+                            <form th:action="@{/recommendations/{id}/move(id=${item.id})}" method="post">
+                                <input type="hidden" name="language" th:value="${language}">
+                                <input type="hidden" name="position" th:value="${item.position}">
+                                <button class="secondary small" name="direction" value="up" th:disabled="${stat.first}" title="Выше" aria-label="Выше">↑</button>
+                            </form>
+                            <form th:action="@{/recommendations/{id}/move(id=${item.id})}" method="post">
+                                <input type="hidden" name="language" th:value="${language}">
+                                <input type="hidden" name="position" th:value="${item.position}">
+                                <button class="secondary small" name="direction" value="down" th:disabled="${stat.last}" title="Ниже" aria-label="Ниже">↓</button>
+                            </form>
+                            <form th:action="@{/recommendations/{id}/active(id=${item.id})}" method="post">
+                                <input type="hidden" name="language" th:value="${language}">
+                                <input type="hidden" name="active" th:value="${!item.isActive()}">
+                                <button class="secondary small" th:text="${item.isActive()} ? 'Скрыть' : 'Показать'">Скрыть</button>
+                            </form>
+                            <form th:action="@{/recommendations/{id}/delete(id=${item.id})}" method="post">
+                                <input type="hidden" name="language" th:value="${language}">
+                                <button class="danger small">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

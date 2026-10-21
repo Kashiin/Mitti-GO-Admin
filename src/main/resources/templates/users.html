@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Пользователи')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Пользователи</h1>
+            <p class="lead">Родители, которые вошли через Google. О детях на сервере ничего не хранится — ни что смотрели, ни экранное время.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <form method="get" th:action="@{/users}" class="search-form">
+                    <div class="field">
+                        <label for="query">Почта или имя</label>
+                        <div class="search">
+                            <input id="query" name="query" type="search" autocomplete="off" maxlength="120" th:value="${query}" placeholder="Например, gmail.com">
+                            <a class="search-clear" th:if="${!query.isEmpty()}" th:href="@{/users}" title="Сбросить поиск" aria-label="Сбросить поиск">×</a>
+                        </div>
+                    </div>
+                    <button type="submit">Найти</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Аккаунты <span class="muted" th:text="'· ' + ${total}">· 0</span></h2>
+                <p class="muted" th:if="${#lists.isEmpty(users)}" th:text="${query.isEmpty()} ? 'Пока никто не входил.' : 'Никого не нашлось.'">Пока никто не входил.</p>
+                <div class="rows">
+                    <div class="row" th:each="u : ${users}">
+                        <div class="row-main">
+                            <div class="row-title">
+                                <span th:text="${u.email}">parent@gmail.com</span>
+                                <span class="muted" th:if="${u.name != null}" th:text="'· ' + ${u.name}">· Имя</span>
+                            </div>
+                            <div class="row-sub">
+                                <span th:text="'с ' + ${u.joined}">с 17.10.2026</span>
+                                <span th:text="' · последний вход ' + ${u.lastSignIn}"> · последний вход 17.10.2026</span>
+                                <span th:if="${u.childDevices > 0}"
+                                      th:text="' · детских устройств: ' + ${u.childDevices} + (${u.lastSync != null} ? ', синхронизация ' + ${u.lastSync} : '')"> · детских устройств: 1</span>
+                            </div>
+                        </div>
+                        <span class="pill" th:classappend="${u.isPro()} ? 'on'" th:text="${u.plan}">Free</span>
+                        <div class="row-actions">
+                            <form th:if="${u.isPro()}" th:action="@{/users/{id}/pro(id=${u.id})}" method="post"
+                                  data-confirm-delete th:data-code="${u.email}">
+                                <input type="hidden" name="action" value="REVOKE">
+                                <input type="hidden" name="email" th:value="${u.email}">
+                                <input type="hidden" name="query" th:value="${query}">
+                                <button class="small danger">Забрать Pro</button>
+                            </form>
+                            <details class="pro-edit">
+                                <summary class="button small secondary">Изменить срок</summary>
+                                <form th:action="@{/users/{id}/pro(id=${u.id})}" method="post" class="pro-edit-form">
+                                    <input type="hidden" name="action" value="SET">
+                                    <input type="hidden" name="email" th:value="${u.email}">
+                                    <input type="hidden" name="query" th:value="${query}">
+                                    <div class="field">
+                                        <label th:for="'until-' + ${u.id}">Pro до (включительно)</label>
+                                        <input th:id="'until-' + ${u.id}" name="until" type="date">
+                                    </div>
+                                    <label class="check"><input type="checkbox" name="lifetime" value="true"> Навсегда</label>
+                                    <button class="small" type="submit">Сохранить</button>
+                                </form>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row-actions" th:if="${hasPrevious or hasNext}">
+                    <a class="button small secondary" th:if="${hasPrevious}" th:href="@{/users(query=${query},page=${page - 1})}">← Назад</a>
+                    <span class="muted" th:text="'Страница ' + ${page + 1}">Страница 1</span>
+                    <a class="button small secondary" th:if="${hasNext}" th:href="@{/users(query=${query},page=${page + 1})}">Дальше →</a>
+                </div>
+            <dialog class="modal" id="confirm-delete" aria-labelledby="confirm-delete-title">
+                <h2 id="confirm-delete-title">Забрать Pro?</h2>
+                <p class="modal-code" data-field="code">parent@gmail.com</p>
+                <p class="muted">Аккаунт сразу станет Free: приложение узнает об этом при следующем открытии. Лишние каналы и плейлисты
+                    встанут на паузу, ничего не удалится. Использованные коды ввести заново нельзя.</p>
+                <div class="modal-actions">
+                    <button type="button" class="secondary" data-action="cancel">Отмена</button>
+                    <button type="button" class="danger-fill" data-action="confirm">Забрать Pro</button>
+                </div>
+            </dialog>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

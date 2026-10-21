@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Что нового')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Что нового</h1>
+            <p class="lead">Список изменений на экране «О приложении», новые сверху, на языке приложения. Пишите только о
+                реально вышедших версиях.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <h2>Новая версия</h2>
+                <form th:action="@{/release-notes}" method="post">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="version">Версия</label>
+                            <input id="version" name="version" type="text" placeholder="1.0.0" required pattern="\d{1,3}\.\d{1,3}\.\d{1,3}">
+                        </div>
+                        <div class="field">
+                            <label for="releasedOn">Дата выхода</label>
+                            <input id="releasedOn" name="releasedOn" type="date" required>
+                        </div>
+                    </div>
+                    <div class="field"><label for="textRu">Текст — русский</label><textarea id="textRu" name="textRu" maxlength="1000" required></textarea></div>
+                    <div class="field"><label for="textUz">Текст — o‘zbekcha</label><textarea id="textUz" name="textUz" maxlength="1000" required></textarea></div>
+                    <div class="field"><label for="textEn">Текст — English</label><textarea id="textEn" name="textEn" maxlength="1000" required></textarea></div>
+                    <button type="submit">Добавить</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Опубликовано</h2>
+                <p class="muted" th:if="${#lists.isEmpty(notes)}">Пока пусто — в приложении блок «Что нового» скрыт.</p>
+                <div class="rows rows-scroll">
+                    <div class="row" th:each="note : ${notes}">
+                        <div class="row-main">
+                            <div class="row-title"><span th:text="${note.version}">1.0.0</span>
+                                <span class="muted" th:text="' · ' + ${#temporals.format(note.releasedOn, 'dd.MM.yyyy')}"></span></div>
+                            <div class="row-sub" th:text="${note.textRu}">…</div>
+                        </div>
+                        <form th:action="@{/release-notes/{id}/delete(id=${note.id})}" method="post">
+                            <button class="danger small">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

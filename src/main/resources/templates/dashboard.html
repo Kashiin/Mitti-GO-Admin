@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Обзор')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page page-full">
+            <h1>Обзор</h1>
+            <p class="lead">Только общие числа. О том, что смотрят дети, сервер ничего не знает и не хранит.</p>
+
+            <div class="note amber" th:unless="${stats.youTubeConfigured}">
+                Ключ YouTube на сервере не задан — новые каналы не загрузятся.
+            </div>
+
+            <div class="grid">
+                <div class="stat">
+                    <div class="stat-value" th:text="${stats.installs}">0</div>
+                    <div class="stat-label">Установок всего</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" th:text="${stats.activeInstalls30d}">0</div>
+                    <div class="stat-label">Активны за 30 дней</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" th:text="${stats.accounts}">0</div>
+                    <div class="stat-label">Google-аккаунтов</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" th:text="${stats.recommendations}">0</div>
+                    <div class="stat-label">Рекомендованных каналов</div>
+                </div>
+            </div>
+
+            <div class="split">
+            <div>
+            <div class="card">
+                <h2>Квота YouTube сегодня</h2>
+                <div><b th:text="${stats.quotaUsedToday}">0</b> из <span th:text="${stats.quotaPerDay}">10000</span> единиц
+                    (<span th:text="${stats.quotaPercent()}">0</span>%)</div>
+                <meter min="0" th:max="${stats.quotaPerDay}" th:value="${stats.quotaUsedToday}"
+                       th:attr="high=${stats.quotaPerDay * 0.8}" low="0"></meter>
+                <p class="muted">Сбрасывается в полночь по тихоокеанскому времени (12:00–13:00 по Ташкенту). С 80% поиск по названию
+                    отключается, работают ссылки и кэш.</p>
+            </div>
+
+            <div class="card">
+                <h2>Кэш YouTube</h2>
+                <div class="grid">
+                    <div><div class="stat-value" th:text="${stats.cachedChannels}">0</div><div class="stat-label">каналов</div></div>
+                    <div><div class="stat-value" th:text="${stats.cachedPlaylists}">0</div><div class="stat-label">плейлистов</div></div>
+                    <div><div class="stat-value" th:text="${stats.cachedVideos}">0</div><div class="stat-label">видео</div></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Последние изменения</h2>
+                <p class="muted" th:if="${#lists.isEmpty(audit)}">Пока ничего.</p>
+                <div class="table-scroll" th:unless="${#lists.isEmpty(audit)}">
+                    <table>
+                    <tr th:each="entry : ${audit}">
+                        <td class="muted" th:text="${entry.whenShort}">01.01 10:00</td>
+                        <td th:text="${entry.admin}">owner</td>
+                        <td><b th:text="${entry.what}">Вход в админку</b> <span class="muted" th:text="${entry.details}"></span></td>
+                    </tr>
+                </table>
+                </div>
+                <p><a href="/audit">Весь журнал →</a></p>
+            </div>
+            </div>
+
+            <div class="card">
+                <h2>На что ушла квота сегодня</h2>
+                <p class="muted">Каждый запрос сервера к YouTube за текущие сутки квоты. Вчерашние записи удаляются, как только квота
+                    сбрасывается. Сколько стоит: поиск по названию — 100 единиц, остальное — 1 единица за запрос (до 50 штук).</p>
+                <p class="muted" th:if="${#lists.isEmpty(quotaUsage)}">Сегодня запросов к YouTube ещё не было.</p>
+                <div class="table-scroll" th:unless="${#lists.isEmpty(quotaUsage)}">
+                    <table>
+                        <thead><tr><th>Откуда</th><th>Запрос к YouTube</th><th>Раз</th><th>Единиц</th></tr></thead>
+                        <tbody>
+                        <tr th:each="u : ${quotaUsage}">
+                            <td th:text="${u.source}">Приложение: лента</td>
+                            <td class="muted" th:text="${u.method}">playlistItems.list</td>
+                            <td th:text="${u.calls}">0</td>
+                            <td><b th:text="${u.units}">0</b></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="sub-heading" th:unless="${#lists.isEmpty(quotaCalls)}">Последние запросы</h2>
+                <div class="table-scroll" th:unless="${#lists.isEmpty(quotaCalls)}">
+                    <table>
+                        <thead><tr><th>Время</th><th>Откуда</th><th>Запрос</th><th>Ед.</th></tr></thead>
+                        <tbody>
+                        <tr th:each="c : ${quotaCalls}">
+                            <td class="muted" th:text="${c.time}">12:00:00</td>
+                            <td th:text="${c.source}">Приложение</td>
+                            <td class="muted" th:text="${c.method}">videos.list</td>
+                            <td th:text="${c.units}">1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

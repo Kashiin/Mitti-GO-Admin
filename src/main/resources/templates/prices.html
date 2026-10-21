@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Цены Pro')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Цены Pro</h1>
+            <p class="lead">Показываются на экране «Тариф» в приложении. Скидка считается сама — относительно оплаты по месяцам.
+                Покупки в приложении пока нет: кнопки появятся, когда подключим Google Play / App Store.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <div class="rows rows-scroll">
+                    <form class="row" th:each="plan : ${plans}" th:action="@{/prices/{m}(m=${plan.periodMonths})}" method="post"
+                          th:classappend="${!plan.isActive()} ? 'off'">
+                        <div class="row-main">
+                            <div class="row-title" th:text="${plan.periodMonths} + (${plan.periodMonths == 1} ? ' месяц' : (${plan.periodMonths < 5} ? ' месяца' : ' месяцев'))">1 месяц</div>
+                        </div>
+                        <div>
+                            <label th:for="'price' + ${plan.periodMonths}">Цена, $</label>
+                            <input th:id="'price' + ${plan.periodMonths}" name="priceUsd" type="text" inputmode="decimal" th:value="${plan.priceUsd}" required>
+                        </div>
+                        <div>
+                            <label th:for="'product' + ${plan.periodMonths}">ID товара в магазине</label>
+                            <input th:id="'product' + ${plan.periodMonths}" name="storeProductId" type="text" th:value="${plan.storeProductId}" placeholder="позже">
+                        </div>
+                        <label class="check"><input type="checkbox" name="active" value="true" th:checked="${plan.isActive()}"> Показывать</label>
+                        <button class="small" type="submit">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+            <p class="note">Цены в сумах не задаются: в магазинах цену в местной валюте покажет сам Google Play / App Store.</p>
+
+            <div class="card">
+                <h2>Что входит в Pro</h2>
+                <p class="muted">Лимиты для родителей с Pro. Бесплатно всегда: 5 каналов, 10 плейлистов, 2 устройства (вместе с телефоном
+                    родителя). Приложение берёт эти числа с сервера при следующем открытии.</p>
+                <form th:action="@{/prices/limits}" method="post">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="maxChannels">Каналы</label>
+                            <input id="maxChannels" name="maxChannels" type="number" min="5" max="500" th:value="${limits.maxChannels}" required>
+                        </div>
+                        <div class="field">
+                            <label for="maxPlaylists">Плейлисты</label>
+                            <input id="maxPlaylists" name="maxPlaylists" type="number" min="10" max="1000" th:value="${limits.maxPlaylists}" required>
+                        </div>
+                        <div class="field">
+                            <label for="maxDevices">Устройства (с телефоном родителя)</label>
+                            <input id="maxDevices" name="maxDevices" type="number" min="2" max="20" th:value="${limits.maxDevices}" required>
+                        </div>
+                    </div>
+                    <button type="submit">Сохранить лимиты</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

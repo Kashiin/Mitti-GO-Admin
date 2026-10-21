@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Категории')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Категории</h1>
+            <p class="lead">Темы раздела «Обучение» в приложении (только Pro). Видео каталога Mitti GO по темам и языкам — откройте тему,
+                чтобы посмотреть её видео, скрыть лишнее или вернуть. Ничего не удаляется.</p>
+
+            <div th:replace="~{fragments :: flash}"></div>
+
+            <div class="card">
+                <h2>Темы <span class="muted" th:text="'· ' + ${#lists.size(topics)} + ' · видео ' + ${totalVideos}">· 0</span></h2>
+                <div class="rows">
+                    <div class="row" th:each="t : ${topics}">
+                        <div class="row-main">
+                            <div class="row-title">
+                                <a th:href="@{/categories/{code}(code=${t.code})}" th:text="${t.titleRu}">Цвета</a>
+                                <span class="muted" th:text="'· ' + ${t.titleUz} + ' · ' + ${t.titleEn}">· Ranglar · Colors</span>
+                            </div>
+                            <div class="row-sub">
+                                <span th:text="'RU ' + ${t.ru} + ' · UZ ' + ${t.uz} + ' · EN ' + ${t.en}">RU 0 · UZ 0 · EN 0</span>
+                                <span class="muted" th:text="' · ' + ${t.code}"> · COLORS</span>
+                            </div>
+                        </div>
+                        <span class="pill" th:classappend="${t.active} ? 'on'" th:text="${t.active} ? 'Видна' : 'Скрыта'">Видна</span>
+                        <div class="row-actions">
+                            <a class="button small secondary" th:href="@{/categories/{code}(code=${t.code})}">Видео</a>
+                            <form th:action="@{/categories/{code}/active(code=${t.code})}" method="post">
+                                <input type="hidden" name="active" th:value="${!t.active}">
+                                <button class="small" th:classappend="${t.active} ? 'danger'" th:text="${t.active} ? 'Скрыть' : 'Показать'">Скрыть</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

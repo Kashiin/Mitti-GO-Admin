@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Ошибка')}"></head>
+<body>
+<div class="shell">
+    <aside th:replace="~{fragments :: side}"></aside>
+    <main class="main">
+        <div class="page">
+            <h1>Не получилось</h1>
+            <div class="flash err" th:text="${message}" role="alert">Ошибка</div>
+            <p><a href="/">На обзор</a></p>
+        </div>
+    </main>
+</div>
+</body>
+</html>
